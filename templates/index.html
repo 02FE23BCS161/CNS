@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure File Integrity Verification</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f3f6fb;
+            color: #172033;
+        }
+
+        header {
+            background: #12233f;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: clamp(23px, 4vw, 34px);
+        }
+
+        header p {
+            margin: 0;
+            color: #c8d6ed;
+        }
+
+        main {
+            width: min(1050px, 92%);
+            margin: 30px auto;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 23px;
+            border-radius: 14px;
+            box-shadow: 0 5px 20px rgba(18, 35, 63, 0.07);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 21px;
+        }
+
+        .card p {
+            color: #586579;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="file"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd4e1;
+            border-radius: 7px;
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2459cf;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1946ac;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 22px;
+            background: white;
+            border-radius: 12px;
+            border-left: 6px solid #64748b;
+            overflow-wrap: anywhere;
+        }
+
+        .result.success {
+            border-left-color: #16834a;
+        }
+
+        .result.failure {
+            border-left-color: #c43d4b;
+        }
+
+        .hash {
+            display: block;
+            padding: 12px;
+            margin-top: 8px;
+            background: #f1f4f9;
+            border-radius: 7px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .download {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 11px 15px;
+            border-radius: 7px;
+            background: #e6edff;
+            color: #1946ac;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .note {
+            font-size: 13px;
+            color: #657187;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #657187;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Secure File Integrity Verification</h1>
+        <p>SHA-256 Hashing · RSA Digital Signatures · Tamper Detection</p>
+    </header>
+
+    <main>
+        <div class="intro">
+            <h2>File Integrity Dashboard</h2>
+            <p>
+                Calculate file hashes, create digital signatures, and verify
+                whether files have changed since they were signed.
+            </p>
+        </div>
+
+        <section class="grid">
+            <div class="card">
+                <h2>1. Calculate SHA-256</h2>
+                <p>Generate a SHA-256 hash to identify the file's contents.</p>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <label for="hash-file">Choose a file</label>
+                    <input id="hash-file" type="file" name="file" required>
+
+                    <button type="submit" name="action" value="hash">
+                        Calculate Hash
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>2. Sign a File</h2>
+                <p>
+                    Sign the file using your encrypted RSA private key.
+                    Download the detached signature for later verification.
+                </p>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <label for="sign-file">Choose a file</label>
+                    <input id="sign-file" type="file" name="file" required>
+
+                    <label for="password">Private-key password</label>
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button type="submit" name="action" value="sign">
+                        Sign File
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>3. Verify a File</h2>
+                <p>
+                    Select the file and its matching detached .sig file.
+                    Verification checks both the signature and file contents.
+                </p>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <label for="verify-file">File to verify</label>
+                    <input id="verify-file" type="file" name="file" required>
+
+                    <label for="signature-file">Detached signature (.sig)</label>
+                    <input
+                        id="signature-file"
+                        type="file"
+                        name="signature"
+                        accept=".sig"
+                        required
+                    >
+
+                    <button type="submit" name="action" value="verify">
+                        Verify Integrity
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        {% if result %}
+        <section
+            class="result {{ 'success' if result.success else 'failure' }}"
+            aria-live="polite"
+        >
+            <h2>{{ result.title }}</h2>
+            <p>{{ result.message }}</p>
+
+            {% if result.filename %}
+            <p><strong>File:</strong> {{ result.filename }}</p>
+            {% endif %}
+
+            {% if result.sha256 %}
+            <strong>SHA-256:</strong>
+            <span class="hash">{{ result.sha256 }}</span>
+            {% endif %}
+
+            {% if result.signature_id %}
+            <a
+                class="download"
+                href="{{ url_for('download_signature',
+                                 signature_id=result.signature_id) }}"
+            >
+                Download Digital Signature
+            </a>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        <p class="note">
+            Demonstration note: a valid signature confirms that the file
+            matches the signed contents and verifies under the selected public
+            key. It does not by itself establish who owns that public key.
+        </p>
+    </main>
+
+    <footer>
+        Cryptography and Network Security · SHA-256 and RSA-PSS Digital Signatures
+    </footer>
+</body>
+</html>
